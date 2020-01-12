@@ -3,6 +3,9 @@ package ImageHoster.controller;
 import ImageHoster.model.User;
 import ImageHoster.model.UserProfile;
 import ImageHoster.service.UserService;
+
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,15 +53,15 @@ public class UserController {
     //If user with entered username and password exists in the database, direct to user homepage displaying all the images in the application
     //If user with entered username and password does not exist in the database, redirect to the same login page
     @RequestMapping(value = "users/login", method = RequestMethod.POST)
-    public String loginUser(User user) {
+    public String loginUser(User user, HttpSession session) {
         //Complete the method
-    	User userObj = userService.login(user);
-    	if(userObj == null) {
-    		// a user with entered username and password does not exist in the database
-    		// redirect to same login page
-    		return "users/login";    		
-    	} else {
-    		return "images";
-    	}
+    	User existingUser = userService.login(user);
+        if(existingUser != null) {
+            session.setAttribute("loggeduser", existingUser);
+            return "redirect:/images";
+        }
+        else {
+            return "users/login";
+        }
     }
 }
